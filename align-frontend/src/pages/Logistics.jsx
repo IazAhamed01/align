@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { useLanguage } from '../context/LanguageContext'
+import ContextualAI from '../components/ContextualAI'
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
 import { Truck, Search, Signal, SignalZero, MapPin } from 'lucide-react'
 import 'leaflet/dist/leaflet.css'
@@ -57,6 +59,7 @@ const filters = [
 ]
 
 function Logistics() {
+    const { language } = useLanguage()
     const [activeFilter, setActiveFilter] = useState('all')
     const [searchQuery, setSearchQuery] = useState('')
 
@@ -75,6 +78,20 @@ function Logistics() {
         }
     }
 
+    // Logistics context for AI
+    const logisticsContext = {
+        transportType: 'Truck',
+        route: 'Kalaburagi to Bangalore',
+        volume: 250,
+        commodity: 'Onions',
+        totalVehicles: 16,
+        movingVehicles: 2,
+        stoppedVehicles: 8,
+        disconnectedVehicles: 6,
+        avgSpeed: '80.54 km/h',
+        distanceTraveled: '1250 km'
+    }
+
     return (
         <div className="logistics page">
             <div className="container-fluid">
@@ -83,6 +100,15 @@ function Logistics() {
                     <div className="header-badges">
                         <img src="/assets/align-logo.jpg" alt="Align" className="logo-mini" />
                         <img src="/assets/ulip-logo.png" alt="ULIP" className="partner-logo" />
+                    </div>
+                    <div className="header-title-row">
+                        <h1>Logistics & Tracking</h1>
+                        <ContextualAI
+                            domain="logistics"
+                            context={logisticsContext}
+                            language={language}
+                            mode="button"
+                        />
                     </div>
                 </div>
 
@@ -180,6 +206,7 @@ function Logistics() {
                         </MapContainer>
                     </div>
                 </div>
+
             </div>
         </div>
     )

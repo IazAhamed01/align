@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useGlobalState } from '../context/GlobalState'
+import { useLanguage } from '../context/LanguageContext'
+import ContextualAI from '../components/ContextualAI'
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
 import { Warehouse, Snowflake, Thermometer, Building2, Cylinder } from 'lucide-react'
 import 'leaflet/dist/leaflet.css'
@@ -32,6 +34,7 @@ const facilitiesData = [
 
 function Storage() {
     const { state, fetchStorage } = useGlobalState()
+    const { language } = useLanguage()
     const [activeFilter, setActiveFilter] = useState('all')
     const [loading, setLoading] = useState(true)
 
@@ -57,6 +60,19 @@ function Storage() {
         }
     }
 
+    // Storage context for AI
+    const storageContext = {
+        storageType: 'Cold Storage',
+        capacity: 1000,
+        currentStock: 330,
+        commodity: 'Onions',
+        facilities: 8,
+        coldStorage: 3,
+        warehouses: 2,
+        utilizationRate: '33%',
+        availableCapacity: 670
+    }
+
     return (
         <div className="storage page">
             <div className="container">
@@ -66,7 +82,15 @@ function Storage() {
                         <img src="/assets/align-logo.jpg" alt="Align" className="logo-mini" />
                         <img src="/assets/ulip-logo.png" alt="ULIP" className="partner-logo" />
                     </div>
-                    <h1>Storage Facilities</h1>
+                    <div className="header-title-row">
+                        <h1>Storage Facilities</h1>
+                        <ContextualAI
+                            domain="storage"
+                            context={storageContext}
+                            language={language}
+                            mode="button"
+                        />
+                    </div>
                     <p className="text-muted">Real-time visibility into storage capacity</p>
                 </div>
 
@@ -155,6 +179,7 @@ function Storage() {
                         </div>
                     ))}
                 </div>
+
             </div>
         </div>
     )

@@ -6,8 +6,29 @@
 .hero {
     position: relative;
     padding: var(--space-20) 0;
-    background: linear-gradient(180deg, var(--color-emerald-50) 0%, var(--color-white) 100%);
+    background-image: url('/assets/hero-background.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
     overflow: hidden;
+    min-height: 600px;
+    display: flex;
+    align-items: center;
+}
+
+/* Dark overlay for text readability */
+.hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg,
+            rgba(0, 0, 0, 0.6) 0%,
+            rgba(16, 185, 129, 0.4) 50%,
+            rgba(0, 0, 0, 0.6) 100%);
+    z-index: 0;
 }
 
 .hero-container {
@@ -24,13 +45,14 @@
     align-items: center;
     gap: var(--space-2);
     padding: var(--space-2) var(--space-4);
-    background: var(--color-white);
-    border: 1px solid var(--color-gray-200);
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(16, 185, 129, 0.3);
     border-radius: var(--radius-full);
     font-size: var(--font-size-sm);
     font-weight: 500;
     color: var(--color-emerald);
     margin-bottom: var(--space-6);
+    backdrop-filter: blur(10px);
 }
 
 .badge-dot {
@@ -47,13 +69,17 @@
     line-height: 1.1;
     margin-bottom: var(--space-6);
     letter-spacing: -0.02em;
+    color: white;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
 }
 
 .hero-description {
     max-width: 600px;
     font-size: var(--font-size-lg);
-    color: var(--color-gray-600);
+    color: rgba(255, 255, 255, 0.95);
     margin-bottom: var(--space-8);
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
+    font-weight: 500;
 }
 
 .hero-actions {
@@ -64,15 +90,7 @@
 }
 
 .hero-gradient {
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 800px;
-    height: 400px;
-    background: radial-gradient(ellipse at center, var(--color-emerald-50) 0%, transparent 70%);
-    opacity: 0.5;
-    pointer-events: none;
+    display: none;
 }
 
 /* Stats Section */

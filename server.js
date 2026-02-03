@@ -27,8 +27,10 @@ app.use(helmet);
 
 // CORS configuration
 const corsOptions = {
-  origin: process.env.CORS_ORIGIN?.split(',') || '*',
-  credentials: true
+  origin: ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:3000'],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 };
 app.use(cors(corsOptions));
 
@@ -40,8 +42,8 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(requestLogger);
 
 // Rate limiting
-const generalLimiter = createRateLimiter({ max: 100, windowMs: 15 * 60 * 1000 });
-const aiLimiter = createRateLimiter({ max: 30, windowMs: 15 * 60 * 1000 });
+const generalLimiter = createRateLimiter({ max: 1000, windowMs: 15 * 60 * 1000 });
+const aiLimiter = createRateLimiter({ max: 1000, windowMs: 15 * 60 * 1000 });
 
 // Apply rate limiting
 app.use('/api/', generalLimiter);

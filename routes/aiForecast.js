@@ -187,7 +187,7 @@ router.post('/dashboard', async (req, res) => {
  */
 router.post('/query', async (req, res) => {
     try {
-        const { question, context } = req.body;
+        const { question, context, language = 'en' } = req.body;
 
         if (!question) {
             return res.status(400).json({
@@ -196,9 +196,23 @@ router.post('/query', async (req, res) => {
             });
         }
 
-        logger.info('Processing natural language query:', { question });
+        logger.info('Processing natural language query:', { question, language });
 
-        const result = await ragService.queryKnowledgeBase(question, {
+        // Add language instruction if not English
+        let enhancedQuestion = question;
+        if (language !== 'en') {
+            const languageNames = {
+                'hi': 'Hindi (हिंदी)',
+                'ta': 'Tamil (தமிழ்)',
+                'te': 'Telugu (తెలుగు)',
+                'kn': 'Kannada (ಕನ್ನಡ)',
+                'mr': 'Marathi (मराठी)',
+                'bn': 'Bengali (বাংলা)'
+            };
+            enhancedQuestion = `${question}\n\nPlease respond in ${languageNames[language] || language}.`;
+        }
+
+        const result = await ragService.queryKnowledgeBase(enhancedQuestion, {
             topK: 5
         });
 
@@ -207,6 +221,7 @@ router.post('/query', async (req, res) => {
             data: {
                 question,
                 answer: result.response,
+                language,
                 sources: result.sources,
                 generated_at: new Date().toISOString()
             }
@@ -313,6 +328,187 @@ router.post('/chat', async (req, res) => {
 
     } catch (error) {
         logger.error('Chat error:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+/**
+ * POST /api/ai-forecast/contextual-query
+ * Context-aware AI query for specific domains (farmers, storage, logistics)
+ */
+router.post('/contextual-query', async (req, res) => {
+    try {
+        const { question, context, language = 'en' } = req.body;
+
+        if (!question) {
+            return res.status(400).json({
+                success: false,
+                error: 'Question is required'
+            });
+        }
+
+        logger.info('Processing contextual query:', { question, domain: context?.domain, language });
+
+        // Build context-aware prompt
+        let enhancedPrompt = question;
+
+        if (context) {
+            const { domain, cropType, harvestDate, location, storageType, capacity,
+                currentStock, transportType, route, volume, commodity } = context;
+
+            // Add domain-specific context
+            if (domain === 'farmers' && cropType) {
+                enhancedPrompt = `
+Context: I am a farmer growing ${cropType} in ${location || 'my region'}.
+${harvestDate ? `My expected harvest date is ${harvestDate}.` : ''}
+
+Question: ${question}
+
+Please provide specific, actionable advice for my situation.`;
+            }
+            else if (domain === 'storage' && storageType) {
+                enhancedPrompt = `
+Context: I manage a ${storageType} facility with ${capacity || 'limited'} capacity.
+${currentStock ? `Current stock: ${currentStock} units of ${commodity || 'produce'}.` : ''}
+
+Question: ${question}
+
+Please provide storage optimization advice for my situation.`;
+            }
+            else if (domain === 'logistics' && transportType) {
+                enhancedPrompt = `
+Context: I handle logistics using ${transportType} for transporting ${commodity || 'agricultural produce'}.
+${route ? `Route: ${route}.` : ''}
+${volume ? `Volume: ${volume} tonnes.` : ''}
+
+Question: ${question}
+
+Please provide logistics optimization advice for my situation.`;
+            }
+        }
+
+        // Add language instruction if not English
+        if (language !== 'en') {
+            const languageNames = {
+                'hi': 'Hindi',
+                'ta': 'Tamil',
+                'te': 'Telugu',
+                'kn': 'Kannada',
+                'mr': 'Marathi',
+                'bn': 'Bengali'
+            };
+            enhancedPrompt += `\n\nPlease respond in ${languageNames[language] || language}.`;
+        }
+
+        // Query AI with enhanced context
+        const result = await ragService.queryKnowledgeBase(enhancedPrompt, {
+            topK: 5
+        });
+
+        res.json({
+            success: true,
+            data: {
+                question,
+                answer: result.response,
+                context: context?.domain || 'general',
+                language,
+                sources: result.sources,
+                generated_at: new Date().toISOString()
+            }
+        });
+
+    } catch (error) {
+        logger.error('Contextual query error:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+/**
+ * POST /api/ai-forecast/auto-insights
+ * Automatically generate insights based on user's domain data
+ */
+router.post('/auto-insights', async (req, res) => {
+    try {
+        const { context } = req.body;
+
+        if (!context || !context.domain) {
+            return res.status(400).json({
+                success: false,
+                error: 'Context with domain is required'
+            });
+        }
+
+        logger.info('Generating auto-insights:', { domain: context.domain });
+
+        let insightPrompt = '';
+
+        // Generate domain-specific insights
+        if (context.domain === 'farmers') {
+            insightPrompt = `
+Analyze this farmer's data and provide 3-5 key actionable insights:
+
+Crop: ${context.cropType || 'Not specified'}
+Location: ${context.location || 'Not specified'}
+Harvest Date: ${context.harvestDate || 'Not specified'}
+Soil Type: ${context.soilType || 'Not specified'}
+Irrigation: ${context.irrigation || 'Not specified'}
+
+Provide insights on:
+1. Optimal harvest timing
+2. Weather considerations
+3. Market timing
+4. Quality optimization
+5. Risk mitigation`;
+        }
+        else if (context.domain === 'storage') {
+            insightPrompt = `
+Analyze this storage facility and provide 3-5 key optimization insights:
+
+Storage Type: ${context.storageType || 'Not specified'}
+Capacity: ${context.capacity || 'Not specified'}
+Current Stock: ${context.currentStock || 'Not specified'}
+Commodity: ${context.commodity || 'Not specified'}
+
+Provide insights on:
+1. Capacity optimization
+2. Spoilage prevention
+3. Temperature/humidity control
+4. Inventory management
+5. Cost reduction`;
+        }
+        else if (context.domain === 'logistics') {
+            insightPrompt = `
+Analyze this logistics operation and provide 3-5 key optimization insights:
+
+Transport Type: ${context.transportType || 'Not specified'}
+Route: ${context.route || 'Not specified'}
+Volume: ${context.volume || 'Not specified'}
+Commodity: ${context.commodity || 'Not specified'}
+
+Provide insights on:
+1. Route optimization
+2. Cost reduction
+3. Time efficiency
+4. Load optimization
+5. Risk management`;
+        }
+
+        const result = await ragService.queryKnowledgeBase(insightPrompt, {
+            topK: 5
+        });
+
+        res.json({
+            success: true,
+            data: {
+                domain: context.domain,
+                insights: result.response,
+                sources: result.sources,
+                generated_at: new Date().toISOString()
+            }
+        });
+
+    } catch (error) {
+        logger.error('Auto-insights error:', error);
         res.status(500).json({ success: false, error: error.message });
     }
 });

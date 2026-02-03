@@ -9,7 +9,7 @@ function Footer() {
                         <span className="logo-text">align</span>
                     </div>
                     <p className="footer-tagline">
-                        Intelligent Alignment for Agriculture
+                        Agricultural Logistics Intelligence and Grid Network
                     </p>
                 </div>
 
@@ -29,7 +29,7 @@ function Footer() {
                 </div>
 
                 <div className="footer-bottom">
-                    <p>© 2026 AlignAI. Built for Hackathon.</p>
+                    <p>© 2026 ALIGN. Built for Hackathon.</p>
                 </div>
             </div>
         </footer>

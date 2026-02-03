@@ -44,12 +44,13 @@ function Landing() {
                     </div>
 
                     <h1 className="hero-title animate-fadeInUp">
-                        Intelligent Alignment for<br />
-                        <span className="text-emerald">Agriculture</span>
+                        <span className="text-emerald">ALIGN</span><br />
+                        Agricultural Logistics Intelligence<br />
+                        and Grid Network
                     </h1>
 
                     <p className="hero-description animate-fadeInUp">
-                        Align AI connects farmers, storage facilities, logistics providers,
+                        ALIGN connects farmers, storage facilities, logistics providers,
                         and markets through intelligent coordination—creating a
                         seamless, efficient agricultural ecosystem.
                     </p>

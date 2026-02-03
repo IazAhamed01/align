@@ -7,6 +7,7 @@ import Farmers from './pages/Farmers'
 import Storage from './pages/Storage'
 import Logistics from './pages/Logistics'
 import Market from './pages/Market'
+import AIAssistant from './pages/AIAssistant'
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
           <Route path="/storage" element={<Storage />} />
           <Route path="/logistics" element={<Logistics />} />
           <Route path="/market" element={<Market />} />
+          <Route path="/ai-assistant" element={<AIAssistant />} />
         </Routes>
       </main>
       <Footer />

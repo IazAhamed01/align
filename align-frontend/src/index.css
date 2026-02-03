@@ -159,6 +159,17 @@ h6 {
   color: var(--color-gray-500);
 }
 
+.header-title-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin-bottom: var(--space-2);
+}
+
+.header-title-row h1 {
+  margin-bottom: 0;
+}
+
 /* ===== LAYOUT ===== */
 .container {
   width: 100%;

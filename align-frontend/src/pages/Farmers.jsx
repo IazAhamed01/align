@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useGlobalState } from '../context/GlobalState'
+import { useLanguage } from '../context/LanguageContext'
+import ContextualAI from '../components/ContextualAI'
 import {
     Users,
     Calendar,
@@ -22,6 +24,7 @@ const varieties = [
 
 function Farmers() {
     const { state, fetchFarmers } = useGlobalState()
+    const { language } = useLanguage()
     const { farmerInputs } = state
     const [loading, setLoading] = useState(true)
 
@@ -45,6 +48,19 @@ function Farmers() {
         )
     }
 
+    // Farming context for AI
+    const farmingContext = {
+        cropType: 'Onion',
+        location: 'Kalaburagi, Karnataka',
+        harvestDate: 'March-April 2025',
+        soilType: 'Black soil',
+        irrigation: 'Drip irrigation',
+        estimatedYield: '1.2M tons',
+        soilMoisture: '65%',
+        pestRisk: 'Low',
+        marketPrice: '₹25/kg'
+    }
+
     return (
         <div className="farmers page">
             <div className="container">
@@ -55,7 +71,15 @@ function Farmers() {
                             <img src="/assets/align-logo.jpg" alt="Align" className="logo-mini" />
                             <img src="/assets/agristack-logo.jpg" alt="AgriStack" className="partner-logo" />
                         </div>
-                        <h1>Farmer Registry</h1>
+                        <div className="header-title-row">
+                            <h1>Farmer Registry</h1>
+                            <ContextualAI
+                                domain="farmers"
+                                context={farmingContext}
+                                language={language}
+                                mode="button"
+                            />
+                        </div>
                         <p className="text-muted">Harvest intent signals and readiness scores</p>
                     </div>
                 </div>
@@ -228,6 +252,7 @@ function Farmers() {
                         ))}
                     </div>
                 </div>
+
             </div>
         </div>
     )

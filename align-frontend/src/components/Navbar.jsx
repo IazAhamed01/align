@@ -1,5 +1,7 @@
 import { NavLink, Link } from 'react-router-dom'
-import { LayoutDashboard, Users, Warehouse, Truck, ShoppingCart } from 'lucide-react'
+import { LayoutDashboard, Users, Warehouse, Truck, ShoppingCart, Sparkles } from 'lucide-react'
+import LanguageSwitcher from './LanguageSwitcher'
+import { useLanguage } from '../context/LanguageContext'
 import './Navbar.css'
 
 const navItems = [
@@ -8,9 +10,12 @@ const navItems = [
     { path: '/storage', label: 'Storage', icon: Warehouse },
     { path: '/logistics', label: 'Logistics', icon: Truck },
     { path: '/market', label: 'Market', icon: ShoppingCart },
+    { path: '/ai-assistant', label: 'AI Assistant', icon: Sparkles },
 ]
 
 function Navbar() {
+    const { language, changeLanguage } = useLanguage()
+
     return (
         <nav className="navbar">
             <div className="navbar-container container">
@@ -32,6 +37,10 @@ function Navbar() {
                 </div>
 
                 <div className="navbar-actions">
+                    <LanguageSwitcher
+                        currentLanguage={language}
+                        onLanguageChange={changeLanguage}
+                    />
                     <Link to="/dashboard" className="btn btn-primary">
                         Get Started
                     </Link>
